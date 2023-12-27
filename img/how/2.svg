@@ -1,0 +1,10 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="grommet-icons:schedule" clip-path="url(#clip0_30_1673)">
+<path id="Vector" d="M48 10.6667V0M16 10.6667V0M2.66666 22.6667H61.3333M16 37.3333C17.4827 33.7787 19.7067 32 22.6667 32C26.1333 32 28 34.6667 28 37.3333C28 40 25.3333 42.6667 22.6667 45.3333L17.3333 50.6667V52H31.7467M45.2933 54.6667L45.3333 32H44C42.6667 36 38.6667 37.3333 36.6853 37.3333M2.66666 61.3333H61.3333V10.6667H2.66666V61.3333Z" stroke="#3AAA60" stroke-width="5"/>
+</g>
+<defs>
+<clipPath id="clip0_30_1673">
+<rect width="64" height="64" fill="white"/>
+</clipPath>
+</defs>
+</svg>
