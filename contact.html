@@ -10,7 +10,7 @@
 			opacity: 0;
 		}
 	</style>
-	<link rel="stylesheet" href="css/style.min.css?_v=20231231132412" />
+	<link rel="stylesheet" href="css/style.min.css?_v=20240101144310" />
 	<link rel="shortcut icon" href="favicon.ico" />
 	<!-- <meta name="robots" content="noindex, nofollow"> -->
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -85,7 +85,51 @@
 							</div>
 						</a>
 					</div>
-					<form action="#" class="contact__form form"></form>
+
+					<form action="files/sendmail/sendmail.php" method="POST" class="contact__form form">
+						<div class="form__line">
+							<label for="name" class="form__label">How can we call you?</label>
+							<input id="name" autocomplete="off" type="text" name="name" placeholder="Your Name" class="input" />
+						</div>
+						<div class="form__line">
+							<label for="address" class="form__label">Adress or ZIP</label>
+							<input id="address" autocomplete="off" type="text" name="address" placeholder="Adress line" class="input" />
+							<input autocomplete="off" type="text" name="postal-code" placeholder="Postal Code" class="input input--small" />
+						</div>
+						<div class="form__line">
+							<label for="email" class="form__label">Your email</label>
+							<input id="email" autocomplete="off" type="email" name="email" placeholder="example@mail.com" class="input" />
+						</div>
+						<div class="form__line">
+							<label for="phone" class="form__label">Your phone</label>
+							<input id="phone" autocomplete="off" type="tel" name="phone" placeholder="+380 000 000 000" class="input" />
+						</div>
+						<div class="form__line">
+							<label class="form__label">Choose service category</label>
+							<select name="service" multiple data-checkbox>
+								<option value="">Select one or more</option>
+								<option value="Handyman">Handyman</option>
+								<option value="Paint & Drywall">Paint & Drywall</option>
+								<option value="Carpentry">Carpentry</option>
+							</select>
+						</div>
+						<div class="form__line">
+							<label class="form__label" for="fileInput">Attach photos (optional)</label>
+							<div id="messageContainer" style="display: none"></div>
+							<div class="dropzone" id="dropzone">Перетягніть файли сюди</div>
+							<input type="file" name="image" id="fileInput" multiple />
+							<div class="file-list" id="fileList"></div>
+						</div>
+						<div class="form__line">
+							<label for="message" class="form__label">Describe your issue</label>
+							<textarea data-autoheight id="message" name="message" placeholder="What project you have in mind? Are the any question you want to ask us? Type away :)" class="input"></textarea>
+						</div>
+						<div class="checkbox">
+							<input id="c_1" data-error="Помилка" class="checkbox__input" type="checkbox" name="agreement" />
+							<label for="c_1" class="checkbox__label"><span class="checkbox__text">I agree with the <a href="info.html">privacy policy</a></span></label>
+						</div>
+						<button type="submit" class="button">Send Contact Request</button>
+					</form>
 				</div>
 			</section>
 		</main>
@@ -120,12 +164,12 @@
 						<a href="#"><img src="img/icons/facebook.svg" alt="facebook" /> </a>
 					</div>
 				</div>
-				<div class="footer__operate">We operate in GTA, Ontario, Canada</div>
+				<p class="footer__operate">We operate in GTA, Ontario, Canada</p>
 			</div>
 		</footer>
 
 	</div>
-	<script src="js/app.min.js?_v=20231231132412"></script>
+	<script src="js/app.min.js?_v=20240101144310"></script>
 </body>
 
 </html>
