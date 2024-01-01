@@ -10,7 +10,7 @@
 			opacity: 0;
 		}
 	</style>
-	<link rel="stylesheet" href="css/style.min.css?_v=20240101145924" />
+	<link rel="stylesheet" href="css/style.min.css?_v=20240101151203" />
 	<link rel="shortcut icon" href="favicon.ico" />
 	<!-- <meta name="robots" content="noindex, nofollow"> -->
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -86,7 +86,7 @@
 						</a>
 					</div>
 
-					<form action="files/sendmail/sendmail.php" method="POST" class="contact__form form">
+					<form action="#" class="contact__form form">
 						<div class="form__line">
 							<label for="name" class="form__label">How can we call you?</label>
 							<input id="name" autocomplete="off" type="text" name="name" placeholder="Your Name" class="input" />
@@ -116,7 +116,9 @@
 						<div class="form__line">
 							<label class="form__label" for="fileInput">Attach photos (optional)</label>
 							<div id="messageContainer" style="display: none"></div>
-							<div class="dropzone" id="dropzone">Перетягніть файли сюди</div>
+							<div class="dropzone" id="dropzone">
+								Drop the file or click to open from your device
+							</div>
 							<input type="file" name="image" id="fileInput" multiple />
 							<div class="file-list" id="fileList"></div>
 						</div>
@@ -169,7 +171,7 @@
 		</footer>
 
 	</div>
-	<script src="js/app.min.js?_v=20240101145924"></script>
+	<script src="js/app.min.js?_v=20240101151203"></script>
 </body>
 
 </html>
