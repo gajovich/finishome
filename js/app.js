@@ -382,7 +382,7 @@
     }
     (() => {
         "use strict";
-        const modules_flsModules = {};
+        const flsModules = {};
         function addLoadedClass() {
             if (!document.documentElement.classList.contains("loading")) window.addEventListener("load", (function() {
                 setTimeout((function() {
@@ -627,7 +627,7 @@
                 }
             }));
         }
-        function functions_FLS(message) {
+        function FLS(message) {
             setTimeout((() => {
                 if (window.FLS) console.log(message);
             }), 0);
@@ -917,11 +917,11 @@
                 if (!this.isOpen && this.lastFocusEl) this.lastFocusEl.focus(); else focusable[0].focus();
             }
             popupLogging(message) {
-                this.options.logging ? functions_FLS(`[Попапос]: ${message}`) : null;
+                this.options.logging ? FLS(`[Попапос]: ${message}`) : null;
             }
         }
-        modules_flsModules.popup = new Popup({});
-        let gotoblock_gotoBlock = (targetBlock, noHeader = false, speed = 500, offsetTop = 0) => {
+        flsModules.popup = new Popup({});
+        let gotoBlock = (targetBlock, noHeader = false, speed = 500, offsetTop = 0) => {
             const targetBlockElement = document.querySelector(targetBlock);
             if (targetBlockElement) {
                 let headerItem = "";
@@ -956,8 +956,8 @@
                         behavior: "smooth"
                     });
                 }
-                functions_FLS(`[gotoBlock]: Юхуу...їдемо до ${targetBlock}`);
-            } else functions_FLS(`[gotoBlock]: Йой... Такого блоку немає на сторінці: ${targetBlock}`);
+                FLS(`[gotoBlock]: Юхуу...їдемо до ${targetBlock}`);
+            } else FLS(`[gotoBlock]: Йой... Такого блоку немає на сторінці: ${targetBlock}`);
         };
         function formFieldsInit(options = {
             viewPass: false,
@@ -1023,7 +1023,19 @@
             },
             validateInput(formRequiredItem) {
                 let error = 0;
-                if (formRequiredItem.dataset.required === "email") {
+                if (formRequiredItem.dataset.required === "message") if (this.messageTest(formRequiredItem)) {
+                    this.addError(formRequiredItem);
+                    error++;
+                } else this.removeError(formRequiredItem); else if (formRequiredItem.dataset.required === "postal-code") if (this.postalCodeTest(formRequiredItem)) {
+                    this.addError(formRequiredItem);
+                    error++;
+                } else this.removeError(formRequiredItem); else if (formRequiredItem.dataset.required === "phone") if (this.phoneTest(formRequiredItem)) {
+                    this.addError(formRequiredItem);
+                    error++;
+                } else this.removeError(formRequiredItem); else if (formRequiredItem.dataset.required === "name") if (this.nameTest(formRequiredItem)) {
+                    this.addError(formRequiredItem);
+                    error++;
+                } else this.removeError(formRequiredItem); else if (formRequiredItem.dataset.required === "email") {
                     formRequiredItem.value = formRequiredItem.value.replace(" ", "");
                     if (this.emailTest(formRequiredItem)) {
                         this.addError(formRequiredItem);
@@ -1065,19 +1077,229 @@
                         const checkbox = checkboxes[index];
                         checkbox.checked = false;
                     }
-                    if (modules_flsModules.select) {
+                    if (flsModules.select) {
                         let selects = form.querySelectorAll(".select");
                         if (selects.length) for (let index = 0; index < selects.length; index++) {
                             const select = selects[index].querySelector("select");
-                            modules_flsModules.select.selectBuild(select);
+                            flsModules.select.selectBuild(select);
                         }
                     }
                 }), 0);
             },
             emailTest(formRequiredItem) {
                 return !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,8})+$/.test(formRequiredItem.value);
+            },
+            nameTest(formRequiredItem) {
+                return formRequiredItem.value.length > 25 || formRequiredItem.value.length === 0;
+            },
+            phoneTest(formRequiredItem) {
+                return formRequiredItem.value.length < 16 || formRequiredItem.value.length === 0;
+            },
+            postalCodeTest(formRequiredItem) {
+                return formRequiredItem.value.length < 6 || formRequiredItem.value.length === 0;
+            },
+            messageTest(formRequiredItem) {
+                return formRequiredItem.value.length < 50;
             }
         };
+        function formSubmit() {
+            const forms = document.forms;
+            if (forms.length) for (const form of forms) {
+                form.addEventListener("submit", (function(e) {
+                    const form = e.target;
+                    formSubmitAction(form, e);
+                }));
+                form.addEventListener("reset", (function(e) {
+                    const form = e.target;
+                    formValidate.formClean(form);
+                }));
+            }
+            async function formSubmitAction(form, e) {
+                const error = !form.hasAttribute("data-no-validate") ? formValidate.getErrors(form) : 0;
+                if (error === 0) {
+                    const ajax = form.hasAttribute("data-ajax");
+                    if (ajax) {
+                        e.preventDefault();
+                        const formAction = form.getAttribute("action") ? form.getAttribute("action").trim() : "#";
+                        const formMethod = form.getAttribute("method") ? form.getAttribute("method").trim() : "GET";
+                        const formData = new FormData(form);
+                        form.classList.add("_sending");
+                        const response = await fetch(formAction, {
+                            method: formMethod,
+                            body: formData
+                        });
+                        if (response.ok) {
+                            let responseResult = await response.json();
+                            form.classList.remove("_sending");
+                            formSent(form, responseResult);
+                        } else {
+                            alert("Помилка");
+                            form.classList.remove("_sending");
+                        }
+                    } else if (form.hasAttribute("data-dev")) {
+                        e.preventDefault();
+                        formSent(form);
+                    }
+                } else {
+                    e.preventDefault();
+                    if (form.querySelector("._form-error") && form.hasAttribute("data-goto-error")) {
+                        const formGoToErrorClass = form.dataset.gotoError ? form.dataset.gotoError : "._form-error";
+                        gotoBlock(formGoToErrorClass, true, 1e3);
+                    }
+                }
+            }
+            function formSent(form, responseResult = ``) {
+                document.dispatchEvent(new CustomEvent("formSent", {
+                    detail: {
+                        form
+                    }
+                }));
+                setTimeout((() => {
+                    if (flsModules.popup) {
+                        const popup = form.dataset.popupMessage;
+                        popup ? flsModules.popup.open(popup) : null;
+                    }
+                }), 0);
+                formValidate.formClean(form);
+                formLogging(`Форму відправлено!`);
+            }
+            function formLogging(message) {
+                FLS(`[Форми]: ${message}`);
+            }
+        }
+        window.addEventListener("DOMContentLoaded", (function() {
+            [].forEach.call(document.querySelectorAll(".tel"), (function(input) {
+                var keyCode;
+                function mask(event) {
+                    event.keyCode && (keyCode = event.keyCode);
+                    var pos = this.selectionStart;
+                    if (pos < 3) event.preventDefault();
+                    var matrix = " +1 ___ ___ ____", i = 0, def = matrix.replace(/\D/g, ""), val = this.value.replace(/\D/g, ""), new_value = matrix.replace(/[_\d]/g, (function(a) {
+                        return i < val.length ? val.charAt(i++) || def.charAt(i) : a;
+                    }));
+                    i = new_value.indexOf("_");
+                    if (i != -1) {
+                        i < 5 && (i = 3);
+                        new_value = new_value.slice(0, i);
+                    }
+                    var reg = matrix.substr(0, this.value.length).replace(/_+/g, (function(a) {
+                        return "\\d{1," + a.length + "}";
+                    })).replace(/[+()]/g, "\\$&");
+                    reg = new RegExp("^" + reg + "$");
+                    if (!reg.test(this.value) || this.value.length < 5 || keyCode > 47 && keyCode < 58) this.value = new_value;
+                    if (event.type == "blur" && this.value.length < 5) this.value = "";
+                }
+                input.addEventListener("input", mask, false);
+                input.addEventListener("focus", mask, false);
+                input.addEventListener("blur", mask, false);
+                input.addEventListener("keydown", mask, false);
+            }));
+        }));
+        const postalCodeInput = document.getElementById("postal-code");
+        if (postalCodeInput) postalCodeInput.addEventListener("input", (function(e) {
+            let value = e.target.value;
+            value = value.toUpperCase();
+            let formattedValue = "";
+            let valid = true;
+            for (let i = 0; i < value.length; i++) {
+                const char = value[i];
+                if (i % 2 === 0 && char.match(/[A-Z]/) || i % 2 === 1 && char.match(/[0-9]/)) formattedValue += char; else {
+                    valid = false;
+                    break;
+                }
+            }
+            if (!valid) postalCodeInput.value = ""; else postalCodeInput.value = formattedValue;
+        }));
+        const loaders = document.querySelectorAll(".file-loader");
+        loaders.forEach((loader => {
+            const dropBox = loader.querySelector(".file-loader__input-wrapper");
+            const input = loader.querySelector(".file-loader__input");
+            const files = loader.querySelector(".file-loader__files");
+            const messageContainer = loader.querySelector(".file-loader__message");
+            const maxFileSize = 5 * 1024 * 1024;
+            const maxFiles = 5;
+            const refreshFiles = () => {
+                files.innerHTML = "";
+                hideMessage();
+                Array.from(input.files).forEach((file => {
+                    const el = document.createElement("li");
+                    el.classList.add("file-lader__file");
+                    el.classList.add("file-loader-file");
+                    const elName = document.createElement("span");
+                    const elDelete = document.createElement("span");
+                    elName.classList.add("file-loader-file__name");
+                    const filenameWithoutExtension = file.name.split(".").slice(0, -1).join(".");
+                    const fileExtension = file.name.split(".").pop();
+                    elName.innerText = filenameWithoutExtension.length > 8 ? filenameWithoutExtension.substring(0, 8) + "..." : filenameWithoutExtension;
+                    elName.innerText += "." + fileExtension;
+                    elDelete.classList.add("file-loader-file__delete");
+                    elDelete.addEventListener("click", (e => {
+                        deleteFile(e.target.parentNode);
+                    }));
+                    elDelete.innerHTML = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">\n            <path d="M14.6597 13.4655C14.8182 13.624 14.9072 13.839 14.9072 14.0631C14.9072 14.2873 14.8182 14.5023 14.6597 14.6608C14.5012 14.8193 14.2862 14.9084 14.062 14.9084C13.8378 14.9084 13.6229 14.8193 13.4644 14.6608L9.00021 10.1953L4.53467 14.6594C4.37616 14.8179 4.16118 14.907 3.93701 14.907C3.71285 14.907 3.49786 14.8179 3.33935 14.6594C3.18085 14.5009 3.0918 14.2859 3.0918 14.0617C3.0918 13.8376 3.18085 13.6226 3.33935 13.4641L7.8049 8.99994L3.34076 4.53439C3.18225 4.37588 3.0932 4.1609 3.0932 3.93674C3.0932 3.71257 3.18225 3.49759 3.34076 3.33908C3.49927 3.18057 3.71425 3.09152 3.93842 3.09152C4.16258 3.09152 4.37756 3.18057 4.53607 3.33908L9.00021 7.80463L13.4658 3.33838C13.6243 3.17987 13.8393 3.09082 14.0634 3.09082C14.2876 3.09082 14.5026 3.17987 14.6611 3.33838C14.8196 3.49689 14.9086 3.71187 14.9086 3.93603C14.9086 4.1602 14.8196 4.37518 14.6611 4.53369L10.1955 8.99994L14.6597 13.4655Z" fill="white"/>\n            </svg>\n            `;
+                    el.appendChild(elName);
+                    el.appendChild(elDelete);
+                    files.appendChild(el);
+                }));
+            };
+            const deleteFile = element => {
+                let dt = new DataTransfer;
+                const index = getChildElementIndex(element);
+                for (let i = 0; i <= input.files.length - 1; i++) if (i !== index) dt.items.add(input.files[i]);
+                input.files = dt.files;
+                refreshFiles();
+            };
+            function getChildElementIndex(element) {
+                return Array.prototype.indexOf.call(element.parentNode.children, element);
+            }
+            function showMessage(message) {
+                messageContainer.style.display = "block";
+                messageContainer.innerText = message;
+            }
+            function hideMessage() {
+                messageContainer.style.display = "none";
+            }
+            dropBox.addEventListener("drop", (e => {
+                e.preventDefault();
+                if (e.dataTransfer.files.length > maxFiles) {
+                    showMessage(`Max files: ${maxFiles}`);
+                    return;
+                }
+                for (let i = 0; i <= e.dataTransfer.files.length - 1; i++) {
+                    if (!e.dataTransfer.files[i].type.startsWith("image/")) {
+                        showMessage(`File ${e.dataTransfer.files[i].name} is not an image`);
+                        return;
+                    }
+                    if (e.dataTransfer.files[i].size > maxFileSize) {
+                        showMessage(`Photo ${e.dataTransfer.files[i].name} is too large. Max 5mb.`);
+                        return;
+                    }
+                }
+                input.files = e.dataTransfer.files;
+                refreshFiles();
+            }));
+            input.addEventListener("change", (e => {
+                e.preventDefault();
+                if (e.target.files.length > maxFiles) {
+                    showMessage(`Max files: ${maxFiles}`);
+                    e.target.value = "";
+                    return;
+                }
+                for (let i = 0; i <= e.target.files.length - 1; i++) {
+                    if (!e.target.files[i].type.startsWith("image/")) {
+                        showMessage(`File ${e.target.files[i].name} is not an image`);
+                        e.target.value = "";
+                        return;
+                    }
+                    if (e.target.files[i].size > maxFileSize) {
+                        showMessage(`Photo ${e.target.files[i].name} is too large. Max 5mb.`);
+                        e.target.value = "";
+                        return;
+                    }
+                }
+                refreshFiles();
+            }));
+        }));
         class SelectConstructor {
             constructor(props, data = null) {
                 let defaultConfig = {
@@ -1435,10 +1657,10 @@
                 }));
             }
             setLogging(message) {
-                this.config.logging ? functions_FLS(`[select]: ${message} `) : null;
+                this.config.logging ? FLS(`[select]: ${message} `) : null;
             }
         }
-        modules_flsModules.select = new SelectConstructor({});
+        flsModules.select = new SelectConstructor({});
         function ssr_window_esm_isObject(obj) {
             return obj !== null && typeof obj === "object" && "constructor" in obj && obj.constructor === Object;
         }
@@ -5211,7 +5433,7 @@
                 this.scrollWatcherLogging(`Я перестав стежити за ${targetElement.classList}`);
             }
             scrollWatcherLogging(message) {
-                this.config.logging ? functions_FLS(`[Спостерігач]: ${message}`) : null;
+                this.config.logging ? FLS(`[Спостерігач]: ${message}`) : null;
             }
             scrollWatcherCallback(entry, observer) {
                 const targetElement = entry.target;
@@ -5224,7 +5446,7 @@
                 }));
             }
         }
-        modules_flsModules.watcher = new ScrollWatcher({});
+        flsModules.watcher = new ScrollWatcher({});
         class parallax_Parallax {
             constructor(elements) {
                 if (elements.length) this.elements = Array.from(elements).map((el => new parallax_Parallax.Each(el, this.options)));
@@ -5294,7 +5516,7 @@
                 if (parameters.axis == "v") el.style.transform = `translate3D(0, ${(parameters.direction * (this.value / parameters.coefficient)).toFixed(2)}px,0) ${parameters.additionalProperties}`; else if (parameters.axis == "h") el.style.transform = `translate3D(${(parameters.direction * (this.value / parameters.coefficient)).toFixed(2)}px,0,0) ${parameters.additionalProperties}`;
             }
         };
-        if (document.querySelectorAll("[data-prlx-parent]") && window.innerWidth > 768) modules_flsModules.parallax = new parallax_Parallax(document.querySelectorAll("[data-prlx-parent]"));
+        if (document.querySelectorAll("[data-prlx-parent]") && window.innerWidth > 768) flsModules.parallax = new parallax_Parallax(document.querySelectorAll("[data-prlx-parent]"));
         let addWindowScrollEvent = false;
         function pageNavigation() {
             document.addEventListener("click", pageNavigationAction);
@@ -5308,14 +5530,14 @@
                         const noHeader = gotoLink.hasAttribute("data-goto-header") ? true : false;
                         const gotoSpeed = gotoLink.dataset.gotoSpeed ? gotoLink.dataset.gotoSpeed : 500;
                         const offsetTop = gotoLink.dataset.gotoTop ? parseInt(gotoLink.dataset.gotoTop) : 0;
-                        if (modules_flsModules.fullpage) {
+                        if (flsModules.fullpage) {
                             const fullpageSection = document.querySelector(`${gotoLinkSelector}`).closest("[data-fp-section]");
                             const fullpageSectionId = fullpageSection ? +fullpageSection.dataset.fpId : null;
                             if (fullpageSectionId !== null) {
-                                modules_flsModules.fullpage.switchingSection(fullpageSectionId);
+                                flsModules.fullpage.switchingSection(fullpageSectionId);
                                 document.documentElement.classList.contains("menu-open") ? menuClose() : null;
                             }
-                        } else gotoblock_gotoBlock(gotoLinkSelector, noHeader, gotoSpeed, offsetTop);
+                        } else gotoBlock(gotoLinkSelector, noHeader, gotoSpeed, offsetTop);
                         e.preventDefault();
                     }
                 } else if (e.type === "watcherCallback" && e.detail) {
@@ -5338,7 +5560,7 @@
             if (getHash()) {
                 let goToHash;
                 if (document.querySelector(`#${getHash()}`)) goToHash = `#${getHash()}`; else if (document.querySelector(`.${getHash()}`)) goToHash = `.${getHash()}`;
-                goToHash ? gotoblock_gotoBlock(goToHash, true, 500, 20) : null;
+                goToHash ? gotoBlock(goToHash, true, 500, 20) : null;
             }
         }
         setTimeout((() => {
@@ -5440,6 +5662,7 @@
             viewPass: false,
             autoHeight: true
         });
+        formSubmit();
         pageNavigation();
     })();
 })();
