@@ -166,6 +166,18 @@ h6 {
   margin-bottom: 1.5rem;
 }
 
+.form__line--phone .input {
+  padding-left: 1.5rem;
+}
+
+.form__line--phone::before {
+  content: "+1";
+  position: absolute;
+  font-weight: 700;
+  left: 0;
+  bottom: 0.75rem;
+}
+
 .form__error {
   position: absolute;
   font-size: 0.75rem;
@@ -174,50 +186,14 @@ h6 {
   left: 0;
 }
 
-.dropzone {
-  border: 2px dashed #ccc;
-  padding: 20px;
-  text-align: center;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.dropzone.dragover {
-  background-color: #f7f7f7;
-}
-
-.file-list {
-  margin-top: 10px;
-}
-
-.file-list-item {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  margin-bottom: 5px;
-}
-
-.file-name {
-  margin-left: 10px;
-}
-
-.remove-file {
-  color: red;
-  cursor: pointer;
-  margin-left: 5px;
-}
-
-.file-loader__message {
+.form .file-loader__message {
   display: none;
   margin-bottom: 0.75rem;
   font-size: 0.75rem;
   color: red;
 }
 
-.file-loader__input-wrapper {
+.form .file-loader__input-wrapper {
   position: relative;
   border: 0.0625rem dashed #3aaa60;
   background: rgba(58, 170, 96, 0.05);
@@ -225,7 +201,7 @@ h6 {
   cursor: pointer;
 }
 
-.file-loader__label {
+.form .file-loader__label {
   display: block;
   font-size: 1rem;
   text-align: center;
@@ -233,7 +209,7 @@ h6 {
   cursor: pointer;
 }
 
-.file-loader__input {
+.form .file-loader__input {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -244,7 +220,7 @@ h6 {
   cursor: pointer;
 }
 
-.file-loader__files {
+.form .file-loader__files {
   margin-top: 0.75rem;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -254,7 +230,7 @@ h6 {
       flex-wrap: wrap;
 }
 
-.file-loader-file {
+.form .file-loader-file {
   min-width: 7.8125rem;
   border-radius: 0.5rem;
   background-color: #1f5d34;
@@ -271,13 +247,13 @@ h6 {
   gap: 0.3125rem;
 }
 
-.file-loader-file__name {
+.form .file-loader-file__name {
   color: #fff;
   font-size: 0.75rem;
   line-height: 1.3333333333;
 }
 
-.file-loader-file__delete {
+.form .file-loader-file__delete {
   cursor: pointer;
   -webkit-transform: translateY(0.0625rem);
       -ms-transform: translateY(0.0625rem);

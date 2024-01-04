@@ -1093,10 +1093,10 @@
                 return formRequiredItem.value.length > 25 || formRequiredItem.value.length === 0;
             },
             phoneTest(formRequiredItem) {
-                return formRequiredItem.value.length < 16 || formRequiredItem.value.length === 0;
+                return formRequiredItem.value.length < 10 || formRequiredItem.value.length === 0 || !/\d{10}/.test(formRequiredItem.value);
             },
             postalCodeTest(formRequiredItem) {
-                return formRequiredItem.value.length < 6 || formRequiredItem.value.length === 0;
+                return !/[a-zA-Z]\d[a-zA-Z]\d[a-zA-Z]\d/.test(formRequiredItem.value);
             },
             messageTest(formRequiredItem) {
                 return formRequiredItem.value.length < 50;
@@ -1167,49 +1167,6 @@
                 FLS(`[Форми]: ${message}`);
             }
         }
-        window.addEventListener("DOMContentLoaded", (function() {
-            [].forEach.call(document.querySelectorAll(".tel"), (function(input) {
-                var keyCode;
-                function mask(event) {
-                    event.keyCode && (keyCode = event.keyCode);
-                    var pos = this.selectionStart;
-                    if (pos < 3) event.preventDefault();
-                    var matrix = " +1 ___ ___ ____", i = 0, def = matrix.replace(/\D/g, ""), val = this.value.replace(/\D/g, ""), new_value = matrix.replace(/[_\d]/g, (function(a) {
-                        return i < val.length ? val.charAt(i++) || def.charAt(i) : a;
-                    }));
-                    i = new_value.indexOf("_");
-                    if (i != -1) {
-                        i < 5 && (i = 3);
-                        new_value = new_value.slice(0, i);
-                    }
-                    var reg = matrix.substr(0, this.value.length).replace(/_+/g, (function(a) {
-                        return "\\d{1," + a.length + "}";
-                    })).replace(/[+()]/g, "\\$&");
-                    reg = new RegExp("^" + reg + "$");
-                    if (!reg.test(this.value) || this.value.length < 5 || keyCode > 47 && keyCode < 58) this.value = new_value;
-                    if (event.type == "blur" && this.value.length < 5) this.value = "";
-                }
-                input.addEventListener("input", mask, false);
-                input.addEventListener("focus", mask, false);
-                input.addEventListener("blur", mask, false);
-                input.addEventListener("keydown", mask, false);
-            }));
-        }));
-        const postalCodeInput = document.getElementById("postal-code");
-        if (postalCodeInput) postalCodeInput.addEventListener("input", (function(e) {
-            let value = e.target.value;
-            value = value.toUpperCase();
-            let formattedValue = "";
-            let valid = true;
-            for (let i = 0; i < value.length; i++) {
-                const char = value[i];
-                if (i % 2 === 0 && char.match(/[A-Z]/) || i % 2 === 1 && char.match(/[0-9]/)) formattedValue += char; else {
-                    valid = false;
-                    break;
-                }
-            }
-            if (!valid) postalCodeInput.value = ""; else postalCodeInput.value = formattedValue;
-        }));
         const loaders = document.querySelectorAll(".file-loader");
         loaders.forEach((loader => {
             const dropBox = loader.querySelector(".file-loader__input-wrapper");
@@ -1234,9 +1191,9 @@
                     elName.innerText += "." + fileExtension;
                     elDelete.classList.add("file-loader-file__delete");
                     elDelete.addEventListener("click", (e => {
-                        deleteFile(e.target.parentNode);
+                        deleteFile(e.currentTarget.parentNode);
                     }));
-                    elDelete.innerHTML = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">\n            <path d="M14.6597 13.4655C14.8182 13.624 14.9072 13.839 14.9072 14.0631C14.9072 14.2873 14.8182 14.5023 14.6597 14.6608C14.5012 14.8193 14.2862 14.9084 14.062 14.9084C13.8378 14.9084 13.6229 14.8193 13.4644 14.6608L9.00021 10.1953L4.53467 14.6594C4.37616 14.8179 4.16118 14.907 3.93701 14.907C3.71285 14.907 3.49786 14.8179 3.33935 14.6594C3.18085 14.5009 3.0918 14.2859 3.0918 14.0617C3.0918 13.8376 3.18085 13.6226 3.33935 13.4641L7.8049 8.99994L3.34076 4.53439C3.18225 4.37588 3.0932 4.1609 3.0932 3.93674C3.0932 3.71257 3.18225 3.49759 3.34076 3.33908C3.49927 3.18057 3.71425 3.09152 3.93842 3.09152C4.16258 3.09152 4.37756 3.18057 4.53607 3.33908L9.00021 7.80463L13.4658 3.33838C13.6243 3.17987 13.8393 3.09082 14.0634 3.09082C14.2876 3.09082 14.5026 3.17987 14.6611 3.33838C14.8196 3.49689 14.9086 3.71187 14.9086 3.93603C14.9086 4.1602 14.8196 4.37518 14.6611 4.53369L10.1955 8.99994L14.6597 13.4655Z" fill="white"/>\n            </svg>\n            `;
+                    elDelete.innerHTML = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">\n\t\t\t<path d="M14.6597 13.4655C14.8182 13.624 14.9072 13.839 14.9072 14.0631C14.9072 14.2873 14.8182 14.5023 14.6597 14.6608C14.5012 14.8193 14.2862 14.9084 14.062 14.9084C13.8378 14.9084 13.6229 14.8193 13.4644 14.6608L9.00021 10.1953L4.53467 14.6594C4.37616 14.8179 4.16118 14.907 3.93701 14.907C3.71285 14.907 3.49786 14.8179 3.33935 14.6594C3.18085 14.5009 3.0918 14.2859 3.0918 14.0617C3.0918 13.8376 3.18085 13.6226 3.33935 13.4641L7.8049 8.99994L3.34076 4.53439C3.18225 4.37588 3.0932 4.1609 3.0932 3.93674C3.0932 3.71257 3.18225 3.49759 3.34076 3.33908C3.49927 3.18057 3.71425 3.09152 3.93842 3.09152C4.16258 3.09152 4.37756 3.18057 4.53607 3.33908L9.00021 7.80463L13.4658 3.33838C13.6243 3.17987 13.8393 3.09082 14.0634 3.09082C14.2876 3.09082 14.5026 3.17987 14.6611 3.33838C14.8196 3.49689 14.9086 3.71187 14.9086 3.93603C14.9086 4.1602 14.8196 4.37518 14.6611 4.53369L10.1955 8.99994L14.6597 13.4655Z" fill="white"/>\n\t\t\t</svg>\n\t\t\t`;
                     el.appendChild(elName);
                     el.appendChild(elDelete);
                     files.appendChild(el);
